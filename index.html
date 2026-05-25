@@ -154,6 +154,43 @@
       border-color: var(--white);
     }
 
+    .hidden {
+      display: none !important;
+    }
+
+    .auth-gate {
+      min-height: calc(100vh - 36px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-panel {
+      width: min(520px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 22px;
+      text-align: center;
+    }
+
+    .auth-panel h1 {
+      font-size: clamp(24px, 5vw, 38px);
+      margin-bottom: 14px;
+    }
+
+    .auth-panel p {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.4px;
+      margin-bottom: 18px;
+    }
+
+    .auth-panel .auth-btn {
+      width: 100%;
+      padding: 14px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -493,6 +530,15 @@
   </style>
 </head>
 <body>
+  <section class="auth-gate" id="authGate">
+    <div class="auth-panel">
+      <h1>@DRUSKHI OUTREACH DASHBOARD</h1>
+      <p id="authGateNotice">Sign in to view dashboard.</p>
+      <button class="auth-btn" id="gateAuthBtn" onclick="toggleAuth()">Sign in Google</button>
+    </div>
+  </section>
+
+  <div id="appShell" class="hidden">
   <div class="container">
     <section class="hero">
       <h1>@DRUSKHI OUTREACH DASHBOARD</h1>
@@ -603,6 +649,8 @@
     </div>
   </div>
 
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -638,11 +686,11 @@
       { name: "J King", region: "User Added", lane: "User-added artist", priority: "USER", fit: "Added by user. Verify lane and recent activity before outreach.", pitch: "Use a short message and lead with why the song fits their sound.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/jking.music/", tiktok: "https://www.tiktok.com/search?q=J%20King%20music", spotify: "https://open.spotify.com/search/J%20King", youtube: "https://www.youtube.com/results?search_query=J+King+music" } },
       { name: "Fredo", region: "User Added", lane: "UK rap / street rap", priority: "USER", fit: "Added by user. Better if the song can lean darker, cleaner, or more street-luxury.", pitch: "Approach professionally; likely better through management or a warm route.", size: "User target", email: "", socials: { instagram: "https://www.instagram.com/fredo/", tiktok: "https://www.tiktok.com/search?q=Fredo%20rapper", spotify: "https://open.spotify.com/search/Fredo", youtube: "https://www.youtube.com/results?search_query=Fredo+rapper" } },
 
-      { name: "Youngn Lipz", region: "Australia", lane: "Melodic rap / R&B", priority: "High", fit: "Very close Day1-adjacent fit. Strong for melodic, relationship-driven records with a clean hook.", pitch: "Lead with the melody and reference direction. Keep it polished and emotional.", size: "Mid-tier / Day1-adjacent", email: "", socials: { instagram: "https://www.instagram.com/youngnlipz/", tiktok: "https://www.tiktok.com/search?q=Youngn%20Lipz", spotify: "https://open.spotify.com/search/Youngn%20Lipz", youtube: "https://www.youtube.com/results?search_query=Youngn+Lipz" } },
+      { name: "Youngn Lipz", region: "Australia", lane: "Melodic rap / R&B", priority: "High", fit: "Very close Day1-adjacent fit. Strong for melodic, relationship-driven records with a clean hook.", pitch: "Lead with the melody and reference direction. Keep it polished and emotional.", size: "Mid-tier", email: "", socials: { instagram: "https://www.instagram.com/youngnlipz/", tiktok: "https://www.tiktok.com/search?q=Youngn%20Lipz", spotify: "https://open.spotify.com/search/Youngn%20Lipz", youtube: "https://www.youtube.com/results?search_query=Youngn+Lipz" } },
       { name: "Hooligan Hefs", region: "Australia", lane: "Aus rap / street rap", priority: "Medium", fit: "Bigger than Day1 but directly in the same ecosystem. Better through management or warm intro.", pitch: "Pitch it as a real record, not just a beat. Emphasize hook and final-song potential.", size: "Upper mid-tier", email: "", socials: { instagram: "https://www.instagram.com/hooliganhefs/", tiktok: "https://www.tiktok.com/search?q=Hooligan%20Hefs", spotify: "https://open.spotify.com/search/Hooligan%20Hefs", youtube: "https://www.youtube.com/results?search_query=Hooligan+Hefs" } },
-      { name: "Lisi", region: "Australia / Pacific", lane: "Storytelling / melodic street rap", priority: "High", fit: "Strong if the song has pain, storytelling, or a big emotional hook.", pitch: "Emphasize the emotion and chorus. Let him know he can make it his own vocally.", size: "Mid-tier / Day1-adjacent", email: "", socials: { instagram: "https://www.instagram.com/lisi4300/", tiktok: "https://www.tiktok.com/search?q=Lisi%20rapper", spotify: "https://open.spotify.com/search/Lisi", youtube: "https://www.youtube.com/results?search_query=Lisi+rapper" } },
+      { name: "Lisi", region: "Australia / Pacific", lane: "Storytelling / melodic street rap", priority: "High", fit: "Strong if the song has pain, storytelling, or a big emotional hook.", pitch: "Emphasize the emotion and chorus. Let him know he can make it his own vocally.", size: "Mid-tier", email: "", socials: { instagram: "https://www.instagram.com/lisi4300/", tiktok: "https://www.tiktok.com/search?q=Lisi%20rapper", spotify: "https://open.spotify.com/search/Lisi", youtube: "https://www.youtube.com/results?search_query=Lisi+rapper" } },
       { name: "The 046", region: "Australia", lane: "Group anthem / Aus funk / rap", priority: "Medium", fit: "Good if the record can become a group anthem or multiple-voice moment.", pitch: "Frame it as a hook-driven anthem they could flip with group energy.", size: "Mid-tier / active scene act", email: "", socials: { instagram: "https://www.instagram.com/the_046_official", tiktok: "https://www.tiktok.com/search?q=The%20046", spotify: "https://open.spotify.com/search/The%20046", youtube: "https://www.youtube.com/results?search_query=The+046" } },
-      { name: "Ay Huncho", region: "Australia", lane: "Melodic street rap / R&B", priority: "High", fit: "Close Day1 lane. Strong for dark melodic pockets or street-love records.", pitch: "Pitch the bounce, melody, and emotional tone. Keep the message direct.", size: "Mid-tier / Day1-adjacent", email: "", socials: { instagram: "https://www.instagram.com/ayhuncho/", tiktok: "https://www.tiktok.com/search?q=Ay%20Huncho", spotify: "https://open.spotify.com/search/Ay%20Huncho", youtube: "https://www.youtube.com/results?search_query=Ay+Huncho" } },
+      { name: "Ay Huncho", region: "Australia", lane: "Melodic street rap / R&B", priority: "High", fit: "Close Day1 lane. Strong for dark melodic pockets or street-love records.", pitch: "Pitch the bounce, melody, and emotional tone. Keep the message direct.", size: "Mid-tier", email: "", socials: { instagram: "https://www.instagram.com/ayhuncho/", tiktok: "https://www.tiktok.com/search?q=Ay%20Huncho", spotify: "https://open.spotify.com/search/Ay%20Huncho", youtube: "https://www.youtube.com/results?search_query=Ay+Huncho" } },
       { name: "Stallyano", region: "New Zealand", lane: "Melodic rap", priority: "High", fit: "Reachable target for emotional, melodic, street-R&B leaning records.", pitch: "Lead with melody/cadence and make it feel like a complete song idea.", size: "Mid-tier / reachable", email: "", socials: { instagram: "https://www.instagram.com/stallyano/", tiktok: "https://www.tiktok.com/search?q=Stallyano", spotify: "https://open.spotify.com/search/Stallyano", youtube: "https://www.youtube.com/results?search_query=Stallyano" } },
       { name: "Sydney Yungins", region: "Australia", lane: "Group rap / drill / party wave", priority: "Medium", fit: "Good if the record can be adapted into a group song or party-facing hook.", pitch: "Frame the song as flexible and easy for multiple voices to jump on.", size: "Lower-mid / scene act", email: "", socials: { instagram: "https://www.instagram.com/sydneyyungins/", tiktok: "https://www.tiktok.com/search?q=Sydney%20Yungins", spotify: "https://open.spotify.com/search/Sydney%20Yungins", youtube: "https://www.youtube.com/results?search_query=Sydney+Yungins" } },
       { name: "Oliver Cronin", region: "Australia", lane: "Pop-R&B / crossover", priority: "Medium", fit: "Good if the song has a big clean hook and crossover potential.", pitch: "Send the most polished private bounce. Emphasize the song, not the beat.", size: "Upper mid-tier / social-facing", email: "", socials: { instagram: "https://www.instagram.com/olivercronin/", tiktok: "https://www.tiktok.com/search?q=Oliver%20Cronin", spotify: "https://open.spotify.com/search/Oliver%20Cronin", youtube: "https://www.youtube.com/results?search_query=Oliver+Cronin" } },
@@ -669,6 +717,11 @@
     const sortSelect = document.getElementById("sortSelect");
     const resultCount = document.getElementById("resultCount");
     const saveStatus = document.getElementById("saveStatus");
+    const appShell = document.getElementById("appShell");
+    const authGate = document.getElementById("authGate");
+    const authGateNotice = document.getElementById("authGateNotice");
+    const authBtn = document.getElementById("authBtn");
+    const gateAuthBtn = document.getElementById("gateAuthBtn");
 
     function slug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
     function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }
@@ -695,9 +748,24 @@
       localStorage.setItem(CUSTOM_ARTISTS_KEY, JSON.stringify(customArtists));
     }
 
+    function setSignedInUi(isSignedIn, message = "Sign in to view dashboard.") {
+      if (isSignedIn) {
+        authGate.classList.add("hidden");
+        appShell.classList.remove("hidden");
+        if (authBtn) authBtn.textContent = "Sign out";
+        if (gateAuthBtn) gateAuthBtn.textContent = "Sign out";
+      } else {
+        appShell.classList.add("hidden");
+        authGate.classList.remove("hidden");
+        authGateNotice.textContent = message;
+        if (authBtn) authBtn.textContent = "Sign in Google";
+        if (gateAuthBtn) gateAuthBtn.textContent = "Sign in Google";
+      }
+    }
+
     async function initFirebaseCloud() {
       if (!FIREBASE_ENABLED) {
-        saveStatus.textContent = "Firebase config missing / local mode";
+        setSignedInUi(false, "Firebase config missing.");
         return;
       }
 
@@ -712,22 +780,21 @@
             firebaseUid = null;
             firebaseDocRef = null;
             firebaseOnline = false;
-            document.getElementById("authBtn").textContent = "Sign in Google";
-            saveStatus.textContent = "Local mode";
+            setSignedInUi(false, "Sign in to view dashboard.");
             return;
           }
 
           firebaseUid = user.uid;
           firebaseDocRef = doc(firebaseDb, "users", firebaseUid, "dashboards", "druskhi-outreach");
           firebaseOnline = true;
-          document.getElementById("authBtn").textContent = "Sign out";
+          setSignedInUi(true);
 
           await loadCloudDashboard();
         });
       } catch (error) {
         console.error("Firebase init failed", error);
         firebaseOnline = false;
-        saveStatus.textContent = "Firebase offline / local mode";
+        setSignedInUi(false, "Firebase offline. Check console/config.");
       }
     }
 
@@ -785,7 +852,8 @@
           priority: artist.priority,
           note: artist.note || "",
           email: artist.email || "",
-          socials: artist.socials || {}
+          socials: artist.socials || {},
+          customTags: artist.customTags || []
         };
       });
       return payload;
@@ -821,7 +889,8 @@
           priority: existing.priority || artist.priority,
           note: existing.note || "",
           email: existing.email || artist.email || "",
-          socials: { ...artist.socials, ...(existing.socials || {}) }
+          socials: { ...artist.socials, ...(existing.socials || {}) },
+          customTags: Array.isArray(existing.customTags) ? existing.customTags : (artist.customTags || [])
         };
       });
     }
@@ -845,7 +914,7 @@
       const priority = priorityFilter.value;
 
       return artists.filter(artist => {
-        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.fit} ${artist.pitch} ${artist.size} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
+        const text = `${artist.name} ${artist.region} ${artist.lane} ${artist.fit} ${artist.pitch} ${artist.size} ${(artist.customTags || []).join(" ")} ${artist.note || ""} ${artist.email || ""}`.toLowerCase();
         return (!query || text.includes(query)) && (region === "All" || artist.region === region) && (priority === "All" || artist.priority === priority);
       });
     }
@@ -863,6 +932,13 @@
         const shell = document.querySelector(`[data-id="${id}"]`);
         if (shell) shell.classList.add("is-editing");
       });
+    }
+
+    function renderCustomTags(artist) {
+      return (artist.customTags || [])
+        .filter(Boolean)
+        .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
+        .join("");
     }
 
     function artistCardHTML(artist) {
@@ -889,6 +965,7 @@
               <div class="tags">
                 <span class="tag">${escapeHtml(artist.lane)}</span>
                 <span class="tag">${escapeHtml(artist.size)}</span>
+                ${renderCustomTags(artist)}
               </div>
 
               <p><strong>Fit:</strong> ${escapeHtml(artist.fit)}</p>
@@ -927,6 +1004,11 @@
                 <div class="edit-block">
                   <div class="edit-label"><span>Email</span><span>Autosaved</span></div>
                   <input type="text" value="${escapeHtml(artist.email || "")}" placeholder="EMAIL" oninput="changeEditableField('${artist.id}', 'email', this.value)" />
+                </div>
+
+                <div class="edit-block">
+                  <div class="edit-label"><span>Custom Tags</span><span>Comma separated</span></div>
+                  <input type="text" value="${escapeHtml((artist.customTags || []).join(', '))}" placeholder="CUSTOM TAGS" oninput="changeCustomTags('${artist.id}', this.value)" />
                 </div>
 
                 <div class="edit-block">
@@ -1012,6 +1094,16 @@
       scheduleSave();
     }
 
+    function changeCustomTags(id, value) {
+      const artist = artists.find(a => a.id === id);
+      if (!artist) return;
+      artist.customTags = value
+        .split(",")
+        .map(tag => tag.trim())
+        .filter(Boolean);
+      scheduleSave();
+    }
+
     function openAllLinks(id) {
       const artist = artists.find(a => a.id === id);
       if (!artist) return;
@@ -1079,6 +1171,7 @@
         }
       };
 
+      artist.customTags = [];
       customArtists.push(artist);
       saveCustomArtists();
       artists.push({ ...artist, id });
@@ -1107,12 +1200,12 @@
     window.changeNote = changeNote;
     window.changeEditableField = changeEditableField;
     window.changeSocial = changeSocial;
+    window.changeCustomTags = changeCustomTags;
     window.openAllLinks = openAllLinks;
     window.toggleAuth = toggleAuth;
 
     async function initApp() {
-      populateRegions();
-      renderArtists();
+      setSignedInUi(false, "Checking sign-in...");
       await initFirebaseCloud();
     }
 
