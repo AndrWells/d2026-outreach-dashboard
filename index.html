@@ -99,6 +99,7 @@
     }
 
     .stats {
+      position: relative;
       display: flex;
       align-items: stretch;
       gap: 8px;
@@ -759,6 +760,20 @@
 
     .summary-globe-btn svg { width: 18px; height: 18px; stroke: currentColor; }
 
+    .summary-list-btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .artist-list-bubble {
+      position: absolute;
+      left: 0;
+      top: calc(100% + 6px);
+      z-index: 18;
+    }
+
     .send-wrap {
       border-top: 1px solid var(--line-2);
       padding-top: 10px;
@@ -1096,6 +1111,10 @@
       <button class="summary-globe-btn" title="Open artist map" aria-label="Open artist map" onclick="showMapPage()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c3 3 3 15 0 18"></path><path d="M12 3c-3 3-3 15 0 18"></path></svg>
       </button>
+      <button class="summary-globe-btn summary-list-btn" title="Copy artist list" aria-label="Copy artist list" onclick="copyArtistList()">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h1"></path><path d="M3 12h1"></path><path d="M3 18h1"></path></svg>
+      </button>
+      <div class="send-warning artist-list-bubble" id="artistListBubble">ARTIST LIST COPIED</div>
     </section>
 
     <section class="filters">
@@ -1968,6 +1987,51 @@
       sendWarningTimers.set(id, setTimeout(() => bubble.classList.remove("is-visible"), 2400));
     }
 
+    let artistListBubbleTimer;
+    function showArtistListCopiedBubble() {
+      const bubble = document.getElementById("artistListBubble");
+      if (!bubble) return;
+      bubble.classList.add("is-visible");
+      clearTimeout(artistListBubbleTimer);
+      artistListBubbleTimer = setTimeout(() => bubble.classList.remove("is-visible"), 2400);
+    }
+
+    function fallbackCopyText(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+
+    async function copyArtistList() {
+      const list = artists
+        .map(artist => artist.name)
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b))
+        .join(", ");
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(list);
+        } else {
+          fallbackCopyText(list);
+        }
+        showArtistListCopiedBubble();
+      } catch (error) {
+        console.error("Artist list copy failed", error);
+        fallbackCopyText(list);
+        showArtistListCopiedBubble();
+      }
+    }
+
     function expandSendEntries(id) {
       sendExpandedCards.add(id);
       renderArtists();
@@ -2265,6 +2329,7 @@
     window.showSettingsPage = showSettingsPage;
     window.showDashboardPage = showDashboardPage;
     window.showMapPage = showMapPage;
+    window.copyArtistList = copyArtistList;
 
     function startPeriodicCloudSync() {
       setInterval(() => {
