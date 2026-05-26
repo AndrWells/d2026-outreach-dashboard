@@ -631,6 +631,12 @@
       text-transform: uppercase;
     }
 
+
+
+    .mobile-filter-toggle {
+      display: none;
+    }
+
     .add-artist-btn {
       position: fixed;
       right: 18px;
@@ -1040,6 +1046,75 @@
       .links { grid-template-columns: repeat(2, 1fr); }
     }
 
+
+
+    @media (max-width: 980px) {
+      body { padding-bottom: 146px; }
+
+      .filters {
+        position: fixed;
+        right: 18px;
+        bottom: 82px;
+        top: auto;
+        z-index: 998;
+        width: min(420px, calc(100vw - 36px));
+        max-height: min(72vh, 520px);
+        overflow: auto;
+        margin-bottom: 0;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(12px) scale(0.98);
+        transform-origin: bottom right;
+        transition: opacity 180ms ease, transform 180ms ease;
+        box-shadow: 8px 8px 0 var(--black), 8px 8px 0 1px var(--line);
+      }
+
+      .filters.is-mobile-open {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+      }
+
+      .mobile-filter-toggle {
+        position: fixed;
+        right: 18px;
+        bottom: 72px;
+        z-index: 999;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 132px;
+        min-height: 45px;
+        border: 1px solid var(--white);
+        background: var(--white);
+        color: var(--black);
+        padding: 14px 16px;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 0;
+        box-shadow: 8px 8px 0 var(--black), 8px 8px 0 1px var(--line);
+      }
+
+      .mobile-filter-toggle:hover,
+      .mobile-filter-toggle.is-open {
+        background: var(--black);
+        color: var(--white);
+        box-shadow: none;
+      }
+
+      .mobile-filter-toggle.is-open {
+        bottom: calc(82px + min(72vh, 520px) + 10px);
+      }
+
+      .add-artist-btn {
+        width: 132px;
+        text-align: center;
+      }
+    }
+
     @media (max-width: 760px) {
       body { padding: 10px; }
       .hero { padding: 14px; flex-direction: column; align-items: stretch; }
@@ -1117,7 +1192,7 @@
       <div class="send-warning artist-list-bubble" id="artistListBubble">ARTIST LIST COPIED</div>
     </section>
 
-    <section class="filters">
+    <section class="filters" id="filtersPanel">
       <div class="filters-grid">
         <input id="searchInput" type="text" placeholder="SEARCH" />
         <select id="regionFilter"><option value="All">ALL REGIONS</option></select>
@@ -1157,6 +1232,7 @@
     </div>
   </div>
 
+  <button class="mobile-filter-toggle" id="mobileFilterToggle" type="button" aria-controls="filtersPanel" aria-expanded="false" onclick="toggleMobileFilters()">Filters</button>
   <button class="add-artist-btn" id="addArtistFloatingBtn" onclick="openAddArtistModal()">+ Add Artist</button>
 
   <div class="modal" id="addArtistModal">
@@ -1301,6 +1377,8 @@
     const priorityFilter = document.getElementById("priorityFilter");
     const colorFilter = document.getElementById("colorFilter");
     const sortSelect = document.getElementById("sortSelect");
+    const filtersPanel = document.getElementById("filtersPanel");
+    const mobileFilterToggle = document.getElementById("mobileFilterToggle");
     const resultCount = document.getElementById("resultCount");
     const saveStatus = document.getElementById("saveStatus");
     const settingsPage = document.getElementById("settingsPage");
@@ -1338,6 +1416,28 @@
     function setFloatingAddVisible(isVisible) {
       const button = document.getElementById("addArtistFloatingBtn");
       if (button) button.classList.toggle("hidden", !isVisible);
+      setMobileFilterVisible(isVisible);
+      if (!isVisible) closeMobileFilters();
+    }
+
+    function setMobileFilterVisible(isVisible) {
+      if (mobileFilterToggle) mobileFilterToggle.classList.toggle("hidden", !isVisible);
+    }
+
+    function closeMobileFilters() {
+      if (filtersPanel) filtersPanel.classList.remove("is-mobile-open");
+      if (mobileFilterToggle) {
+        mobileFilterToggle.classList.remove("is-open");
+        mobileFilterToggle.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    function toggleMobileFilters() {
+      if (!filtersPanel || !mobileFilterToggle) return;
+      const isOpen = filtersPanel.classList.toggle("is-mobile-open");
+      mobileFilterToggle.classList.toggle("is-open", isOpen);
+      mobileFilterToggle.setAttribute("aria-expanded", String(isOpen));
+      if (isOpen) setTimeout(() => searchInput.focus({ preventScroll: true }), 0);
     }
 
     function showSettingsPage() {
@@ -2330,6 +2430,15 @@
     window.showDashboardPage = showDashboardPage;
     window.showMapPage = showMapPage;
     window.copyArtistList = copyArtistList;
+    window.toggleMobileFilters = toggleMobileFilters;
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 980) closeMobileFilters();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeMobileFilters();
+    });
 
     function startPeriodicCloudSync() {
       setInterval(() => {
