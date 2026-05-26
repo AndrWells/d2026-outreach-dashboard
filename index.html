@@ -1513,8 +1513,10 @@
           const cloud = snap.data();
 
           if (Array.isArray(cloud.artists)) {
-            const localUnsyncedArtists = loadLocalArtists();
-            artists = dedupeArtists([...cloud.artists, ...localUnsyncedArtists]);
+            const cloudArtists = dedupeArtists(cloud.artists);
+            const cloudArtistIds = new Set(cloudArtists.map(artist => artist.id));
+            const localOnlyArtists = loadLocalArtists().filter(artist => !cloudArtistIds.has(artist.id));
+            artists = dedupeArtists([...localOnlyArtists, ...cloudArtists]);
           } else {
             const cloudState = cloud.state || {};
             const cloudCustomArtists = Array.isArray(cloud.customArtists) ? cloud.customArtists : [];
