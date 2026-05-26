@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MONEYOVERALL OUTREACH DASHBOARD</title>
+  <title>MONEYOVERALL</title>
   <style>
     :root {
       --bg: #080808;
@@ -702,7 +702,7 @@
 
     .send-row {
       display: grid;
-      grid-template-columns: 28px 1fr;
+      grid-template-columns: 28px 1fr 28px;
       align-items: center;
       gap: 6px;
     }
@@ -718,6 +718,11 @@
       place-items: center;
     }
 
+    .send-row input[type="checkbox"].needs-date {
+      color: var(--faint);
+      border-color: var(--line-2);
+    }
+
     .send-row input[type="checkbox"]:checked::after {
       content: "";
       width: 10px;
@@ -728,6 +733,32 @@
     }
 
     .send-row input[type="date"] { padding: 7px; font-size: 11px; }
+
+    .send-remove-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--line);
+      background: var(--black);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    .send-remove-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+    }
+
+    .send-remove-btn:hover {
+      color: var(--white);
+      border-color: var(--white);
+      background: var(--panel-2);
+    }
 
     .send-add-btn {
       border: 1px solid var(--line);
@@ -743,10 +774,16 @@
       width: 100%;
     }
 
-    .send-add-btn:hover {
+    .send-add-btn:hover:not(:disabled) {
       background: var(--white);
       color: var(--black);
       border-color: var(--white);
+    }
+
+    .send-add-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      color: var(--faint);
     }
 
     .show-send-all {
@@ -812,7 +849,7 @@
     .map-shell {
       position: relative;
       width: 100%;
-      min-height: 540px;
+      min-height: 560px;
       border: 1px solid var(--line);
       background: var(--black);
       overflow: hidden;
@@ -820,14 +857,30 @@
 
     .world-map {
       width: 100%;
-      height: 540px;
+      height: 560px;
       display: block;
     }
 
-    .map-land {
+    .map-graticule {
       fill: none;
+      stroke: var(--line-2);
+      stroke-width: 0.75;
+      opacity: 0.7;
+    }
+
+    .map-land {
+      fill: rgba(255,255,255,0.035);
       stroke: var(--line);
-      stroke-width: 1.4;
+      stroke-width: 0.72;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .map-border {
+      fill: none;
+      stroke: var(--line-2);
+      stroke-width: 0.38;
+      opacity: 0.85;
+      vector-effect: non-scaling-stroke;
     }
 
     .map-dot {
@@ -850,13 +903,31 @@
 
     .map-legend {
       display: flex;
-      gap: 16px;
+      gap: 18px;
       flex-wrap: wrap;
       color: var(--muted);
       font-size: 11px;
       text-transform: uppercase;
       margin-top: 10px;
+      align-items: center;
     }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      display: inline-block;
+      border: 1px solid var(--line);
+    }
+
+    .legend-dot.sent { background: #37d16f; }
+    .legend-dot.unsent { background: var(--white); }
 
     .footer {
       text-align: center;
@@ -928,18 +999,19 @@
         <button class="nav-btn" onclick="showDashboardPage()">Back to Dashboard</button>
       </div>
       <div class="map-shell">
-        <svg class="world-map" id="worldMap" viewBox="0 0 1000 520" role="img" aria-label="World map of outreach artists">
-          <path class="map-land" d="M128 116 L202 82 L278 96 L322 144 L294 192 L224 196 L196 244 L142 232 L94 178 Z" />
-          <path class="map-land" d="M252 244 L314 286 L342 356 L302 446 L244 414 L222 336 Z" />
-          <path class="map-land" d="M458 108 L560 74 L682 96 L744 152 L724 226 L612 226 L560 190 L488 204 L422 160 Z" />
-          <path class="map-land" d="M516 226 L612 238 L668 306 L644 414 L574 438 L512 360 L486 280 Z" />
-          <path class="map-land" d="M720 242 L814 252 L880 320 L852 390 L766 380 L718 314 Z" />
-          <path class="map-land" d="M800 388 L874 408 L912 456 L862 474 L796 438 Z" />
-          <path class="map-land" d="M420 76 L468 52 L514 72 L494 102 L442 108 Z" />
+        <svg class="world-map" id="worldMap" viewBox="0 0 1000 560" role="img" aria-label="World map of outreach artists">
+          <rect x="0" y="0" width="1000" height="560" fill="transparent"></rect>
+          <g class="map-graticule">
+            <path d="M40 280H960"></path><path d="M500 30V530"></path>
+            <path d="M40 113.3H960"></path><path d="M40 196.7H960"></path><path d="M40 363.3H960"></path><path d="M40 446.7H960"></path>
+            <path d="M166.7 30V530"></path><path d="M333.3 30V530"></path><path d="M666.7 30V530"></path><path d="M833.3 30V530"></path>
+          </g>
+          <g id="mapLandLayer"></g>
+          <g id="mapBorderLayer"></g>
           <g id="mapDots"></g>
         </svg>
       </div>
-      <div class="map-legend"><span>Green pulse = SENT</span><span>White = not sent</span></div>
+      <div class="map-legend"><span class="legend-item"><span class="legend-dot sent"></span>SENT</span><span class="legend-item"><span class="legend-dot unsent"></span>NOT SENT</span></div>
     </section>
 
     <div id="dashboardPage">
@@ -982,7 +1054,7 @@
     </div>
   </div>
 
-  <button class="add-artist-btn" onclick="openAddArtistModal()">+ Add Artist</button>
+  <button class="add-artist-btn" id="addArtistFloatingBtn" onclick="openAddArtistModal()">+ Add Artist</button>
 
   <div class="modal" id="addArtistModal">
     <div class="modal-panel">
@@ -1052,6 +1124,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { geoEquirectangular, geoPath } from "https://cdn.jsdelivr.net/npm/d3-geo@3/+esm";
+    import { feature, mesh } from "https://cdn.jsdelivr.net/npm/topojson-client@3/+esm";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB4mAggiPorQdcnMrvox8t6ZNxF7o1C98o",
@@ -1156,22 +1230,34 @@
       applyThemePreference(value);
     }
 
+    function setFloatingAddVisible(isVisible) {
+      const button = document.getElementById("addArtistFloatingBtn");
+      if (button) button.classList.toggle("hidden", !isVisible);
+    }
+
     function showSettingsPage() {
+      document.title = "MONEYOVERALL";
       dashboardPage.classList.add("hidden");
       mapPage.classList.add("hidden");
       settingsPage.classList.remove("hidden");
+      setFloatingAddVisible(false);
     }
 
     function showDashboardPage() {
+      document.title = "MONEYOVERALL";
       settingsPage.classList.add("hidden");
       mapPage.classList.add("hidden");
       dashboardPage.classList.remove("hidden");
+      setFloatingAddVisible(true);
     }
 
     function showMapPage() {
+      document.title = "MONEYOVERALL";
       settingsPage.classList.add("hidden");
       dashboardPage.classList.add("hidden");
       mapPage.classList.remove("hidden");
+      setFloatingAddVisible(false);
+      renderMapLand();
       renderMapDots();
     }
     function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }
@@ -1206,19 +1292,32 @@
       localStorage.setItem(DELETED_ARTISTS_KEY, JSON.stringify(deletedArtistIds));
     }
 
+    function isValidSendDate(value) {
+      if (!value) return false;
+      const date = String(value);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+      const parsed = new Date(`${date}T00:00:00`);
+      return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+    }
+
     function normalizeSendEntries(entries) {
       if (!Array.isArray(entries)) return [];
-      return entries.map(entry => ({
-        checked: Boolean(entry && entry.checked),
-        date: entry && entry.date ? String(entry.date) : ""
-      })).filter(entry => entry.date || entry.checked);
+      return entries.map(entry => {
+        const date = entry && entry.date ? String(entry.date) : "";
+        const checked = Boolean(entry && entry.checked && isValidSendDate(date));
+        return { checked, date };
+      });
+    }
+
+    function confirmedSendEntries(entries) {
+      return normalizeSendEntries(entries).filter(entry => entry.checked && isValidSendDate(entry.date));
     }
 
     function hasSent(artist) {
-      return Array.isArray(artist.sendEntries) && artist.sendEntries.length > 0;
+      return confirmedSendEntries(artist.sendEntries).length > 0;
     }
 
-    function normalizeArtist(artist) {
+    function normalizeArtist(artist, persist = false) {
       const id = artist.id || slug(artist.name || "artist");
       return {
         name: artist.name || "Untitled Artist",
@@ -1231,7 +1330,7 @@
         size: artist.size || "User target",
         email: artist.email || "",
         note: artist.note || "",
-        sendEntries: normalizeSendEntries(artist.sendEntries),
+        sendEntries: persist ? confirmedSendEntries(artist.sendEntries) : normalizeSendEntries(artist.sendEntries),
         customTags: Array.isArray(artist.customTags) ? artist.customTags : [],
         socials: {
           instagram: artist.socials?.instagram || "https://www.instagram.com/",
@@ -1257,7 +1356,7 @@
     }
 
     function saveLocalArtists() {
-      localStorage.setItem(ARTISTS_CACHE_KEY, JSON.stringify(artists.map(normalizeArtist)));
+      localStorage.setItem(ARTISTS_CACHE_KEY, JSON.stringify(artists.map(artist => normalizeArtist(artist, true))));
     }
 
     function saveCustomArtists() {
@@ -1374,7 +1473,7 @@
           priority: artist.priority,
           note: artist.note || "",
           email: artist.email || "",
-          sendEntries: normalizeSendEntries(artist.sendEntries),
+          sendEntries: confirmedSendEntries(artist.sendEntries),
           socials: artist.socials || {},
           customTags: artist.customTags || []
         };
@@ -1393,9 +1492,9 @@
 
       try {
         await setDoc(firebaseDocRef, {
-          artists: artists.map(normalizeArtist),
+          artists: artists.map(artist => normalizeArtist(artist, true)),
           state: payload,
-          customArtists: artists.filter(artist => !baseArtists.some(baseArtist => slug(baseArtist.name) === artist.id)).map(normalizeArtist),
+          customArtists: artists.filter(artist => !baseArtists.some(baseArtist => slug(baseArtist.name) === artist.id)).map(artist => normalizeArtist(artist, true)),
           deletedArtistIds,
           updatedAt: serverTimestamp()
         }, { merge: true });
@@ -1470,17 +1569,30 @@
         .join("");
     }
 
+    function sendRemoveIconSvg() {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>';
+    }
+
     function renderSendEntries(artist) {
       const entries = normalizeSendEntries(artist.sendEntries);
       const expanded = sendExpandedCards.has(artist.id);
       const visibleEntries = expanded ? entries : entries.slice(0, 3);
-      const entryHtml = visibleEntries.map((entry, index) => `
+      const canAdd = hasSent(artist);
+      const rowHtml = (entry, index) => {
+        const needsDateClass = isValidSendDate(entry.date) ? "" : " needs-date";
+        return `
         <div class="send-row">
-          <input type="checkbox" ${entry.checked ? "checked" : ""} onclick="toggleSendEntryChecked(event, '${artist.id}', ${index})" aria-label="Mark send entry complete" />
-          <input type="date" value="${escapeHtml(entry.date)}" onchange="changeSendEntryDate('${artist.id}', ${index}, this.value)" />
-        </div>
-      `).join("");
-      const emptyHtml = entries.length ? "" : '<div class="send-row"><input type="checkbox" onclick="showSendWarningForId(\'' + artist.id + '\')" aria-label="Add date first" /><input type="date" onchange="createFirstSendEntry(\'' + artist.id + '\', this.value)" /></div>';
+          <input type="checkbox" class="${needsDateClass.trim()}" ${entry.checked ? "checked" : ""} onclick="return toggleSendEntryChecked(event, '${artist.id}', ${index})" aria-label="Mark send entry complete" />
+          <input type="date" value="${escapeHtml(entry.date)}" oninput="changeSendEntryDate('${artist.id}', ${index}, this.value, false)" />
+          <button class="send-remove-btn" type="button" title="Remove send entry" aria-label="Remove send entry" onclick="removeSendEntry('${artist.id}', ${index})">${sendRemoveIconSvg()}</button>
+        </div>`;
+      };
+      const entryHtml = visibleEntries.map(rowHtml).join("");
+      const emptyHtml = entries.length ? "" : `<div class="send-row">
+        <input type="checkbox" class="needs-date" onclick="return emptySendCheckboxClicked(event, '${artist.id}')" aria-label="Add date first" />
+        <input type="date" oninput="createFirstSendEntry('${artist.id}', this.value, false)" />
+        <button class="send-remove-btn" type="button" title="Clear send entry" aria-label="Clear send entry" onclick="clearFirstSendEntry('${artist.id}')">${sendRemoveIconSvg()}</button>
+      </div>`;
       const showAll = entries.length > 3 && !expanded ? `<button class="show-send-all" onclick="expandSendEntries('${artist.id}')">show all entry</button>` : "";
       return `
         <div class="send-wrap">
@@ -1488,7 +1600,7 @@
           <div class="send-warning" id="sendWarning-${artist.id}">! add date first</div>
           <div class="send-entries">${entryHtml || emptyHtml}</div>
           ${showAll}
-          <button class="send-add-btn" onclick="addSendEntry('${artist.id}')">Send Entry</button>
+          <button class="send-add-btn" ${canAdd ? "" : "disabled"} onclick="addSendEntry('${artist.id}')">+ SEND ENTRY</button>
         </div>
       `;
     }
@@ -1611,51 +1723,115 @@
       return artists.find(a => a.id === id);
     }
 
+    function saveSendStateAfterInlineEdit() {
+      scheduleSave();
+      updateStats();
+      renderMapDots();
+    }
+
     function addSendEntry(id) {
       const artist = getArtistById(id);
-      if (!artist) return;
+      if (!artist || !hasSent(artist)) return;
       artist.sendEntries = normalizeSendEntries(artist.sendEntries);
       artist.sendEntries.push({ checked: false, date: "" });
       sendExpandedCards.add(id);
-      scheduleSave();
+      saveSendStateAfterInlineEdit();
       renderArtists();
     }
 
-    function createFirstSendEntry(id, value) {
+    function emptySendCheckboxClicked(event, id) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.checked = false;
+        setTimeout(() => { event.currentTarget.checked = false; }, 0);
+      }
+      showSendWarningForId(id);
+      return false;
+    }
+
+    function createFirstSendEntry(id, value, rerender = false) {
       const artist = getArtistById(id);
-      if (!artist || !value) return;
-      artist.sendEntries = [{ checked: false, date: value }];
-      scheduleSave();
+      if (!artist) return;
+      artist.sendEntries = normalizeSendEntries(artist.sendEntries);
+      if (!artist.sendEntries.length) artist.sendEntries = [{ checked: false, date: "" }];
+      artist.sendEntries[0].date = value || "";
+      if (!isValidSendDate(artist.sendEntries[0].date)) artist.sendEntries[0].checked = false;
+      saveSendStateAfterInlineEdit();
+      if (rerender) renderArtists();
+      else {
+        const button = document.querySelector(`[data-id="${id}"] .send-add-btn`);
+        if (button) button.disabled = !hasSent(artist);
+        const checkbox = document.querySelector(`[data-id="${id}"] .send-row input[type="checkbox"]`);
+        if (checkbox) checkbox.classList.toggle("needs-date", !isValidSendDate(artist.sendEntries[0].date));
+      }
+    }
+
+    function clearFirstSendEntry(id) {
+      const artist = getArtistById(id);
+      if (!artist) return;
+      artist.sendEntries = [];
+      sendExpandedCards.delete(id);
+      saveSendStateAfterInlineEdit();
       renderArtists();
     }
 
-    function changeSendEntryDate(id, index, value) {
+    function changeSendEntryDate(id, index, value, rerender = false) {
       const artist = getArtistById(id);
       if (!artist) return;
       artist.sendEntries = normalizeSendEntries(artist.sendEntries);
       if (!artist.sendEntries[index]) artist.sendEntries[index] = { checked: false, date: "" };
-      artist.sendEntries[index].date = value;
-      if (!value) artist.sendEntries[index].checked = false;
+      artist.sendEntries[index].date = value || "";
+      if (!isValidSendDate(artist.sendEntries[index].date)) artist.sendEntries[index].checked = false;
+      saveSendStateAfterInlineEdit();
+      if (rerender) renderArtists();
+      else {
+        const button = document.querySelector(`[data-id="${id}"] .send-add-btn`);
+        if (button) button.disabled = !hasSent(artist);
+        const row = document.querySelectorAll(`[data-id="${id}"] .send-row`)[index];
+        const checkbox = row ? row.querySelector('input[type="checkbox"]') : null;
+        if (checkbox) {
+          checkbox.checked = Boolean(artist.sendEntries[index].checked);
+          checkbox.classList.toggle("needs-date", !isValidSendDate(artist.sendEntries[index].date));
+        }
+      }
+    }
+
+    function removeSendEntry(id, index) {
+      const artist = getArtistById(id);
+      if (!artist) return;
       artist.sendEntries = normalizeSendEntries(artist.sendEntries);
-      scheduleSave();
+      if (artist.sendEntries.length <= 1) {
+        artist.sendEntries = [];
+        sendExpandedCards.delete(id);
+      } else {
+        artist.sendEntries.splice(index, 1);
+      }
+      saveSendStateAfterInlineEdit();
       renderArtists();
     }
 
     function toggleSendEntryChecked(event, id, index) {
       const artist = getArtistById(id);
-      if (!artist) return;
+      if (!artist) return false;
       artist.sendEntries = normalizeSendEntries(artist.sendEntries);
       const entry = artist.sendEntries[index];
-      if (!entry || !entry.date) {
-        event.preventDefault();
-        event.currentTarget.checked = false;
+      if (!entry || !isValidSendDate(entry.date)) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.currentTarget.checked = false;
+          setTimeout(() => { event.currentTarget.checked = false; }, 0);
+        }
+        if (entry) entry.checked = false;
         showSendWarningForId(id);
-        return;
+        saveSendStateAfterInlineEdit();
+        return false;
       }
-      entry.checked = event.currentTarget.checked;
-      scheduleSave();
-      updateStats();
+      entry.checked = Boolean(event.currentTarget.checked);
+      saveSendStateAfterInlineEdit();
       renderMapDots();
+      return true;
     }
 
     function showSendWarningForId(id) {
@@ -1765,31 +1941,64 @@
       renderArtists();
     }
 
+    const mapProjection = geoEquirectangular()
+      .rotate([-10, 0])
+      .fitExtent([[26, 28], [974, 532]], { type: "Sphere" });
+    const mapPath = geoPath(mapProjection);
+    let mapLandLoaded = false;
+
     const regionCoordinates = {
-      "United States": [205, 190],
-      "User Added": [500, 245],
-      "Australia": [800, 382],
-      "Australia / Pacific": [832, 360],
-      "New Zealand": [885, 420],
-      "United Kingdom": [462, 145],
-      "UK": [462, 145],
-      "Canada": [200, 120],
-      "Europe": [505, 155],
-      "Africa": [545, 300],
-      "Asia": [700, 190],
-      "Pacific": [850, 330]
+      "United States": [-98.5, 39.8],
+      "User Added": [-15, 18],
+      "Australia": [134.5, -25.5],
+      "Australia / Pacific": [151.2, -27.5],
+      "New Zealand": [172.9, -41.5],
+      "United Kingdom": [-2.5, 54.2],
+      "UK": [-2.5, 54.2],
+      "Canada": [-106.3, 56.1],
+      "Europe": [15, 50],
+      "Africa": [20, 1],
+      "Asia": [90, 38],
+      "Pacific": [166, -15]
     };
 
     function hashRegionCoordinate(region) {
       let hash = 0;
       String(region || "Unknown").split("").forEach(char => hash = ((hash << 5) - hash) + char.charCodeAt(0));
-      const x = 120 + Math.abs(hash % 760);
-      const y = 105 + Math.abs((hash >> 3) % 315);
-      return [x, y];
+      const lon = -170 + Math.abs(hash % 340);
+      const lat = -55 + Math.abs((hash >> 3) % 120);
+      return [lon, lat];
     }
 
     function getRegionCoordinate(region) {
       return regionCoordinates[region] || hashRegionCoordinate(region);
+    }
+
+    async function renderMapLand() {
+      const landLayer = document.getElementById("mapLandLayer");
+      const borderLayer = document.getElementById("mapBorderLayer");
+      if (!landLayer || mapLandLoaded) return;
+      try {
+        const response = await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-10m.json");
+        const topology = await response.json();
+        const countries = feature(topology, topology.objects.countries).features;
+        const borders = mesh(topology, topology.objects.countries, (a, b) => a !== b);
+        landLayer.innerHTML = countries
+          .map(country => `<path class="map-land" d="${mapPath(country)}"></path>`)
+          .join("");
+        if (borderLayer) borderLayer.innerHTML = `<path class="map-border" d="${mapPath(borders)}"></path>`;
+        mapLandLoaded = true;
+      } catch (error) {
+        console.warn("Detailed map load failed; using fallback outlines.", error);
+        if (borderLayer) borderLayer.innerHTML = "";
+        landLayer.innerHTML = `
+          <path class="map-land" d="M118 122 L156 96 L215 79 L268 83 L318 103 L356 139 L359 177 L334 205 L296 215 L266 244 L236 236 L205 255 L166 242 L137 205 L102 184 L87 151 Z"></path>
+          <path class="map-land" d="M261 252 L304 275 L332 316 L349 369 L331 429 L295 491 L258 468 L230 420 L219 369 L231 315 Z"></path>
+          <path class="map-land" d="M412 132 L454 98 L520 74 L600 82 L666 106 L730 129 L777 166 L776 210 L744 236 L678 227 L636 246 L588 219 L540 231 L496 207 L449 210 L406 179 Z"></path>
+          <path class="map-land" d="M510 238 L558 248 L612 279 L646 328 L647 389 L625 455 L580 475 L538 430 L515 369 L485 318 L493 270 Z"></path>
+          <path class="map-land" d="M686 214 L734 198 L807 213 L872 249 L921 304 L903 351 L848 358 L811 331 L760 348 L719 315 L696 270 Z"></path>
+          <path class="map-land" d="M768 392 L827 381 L882 401 L922 438 L907 474 L844 492 L785 465 L744 425 Z"></path>`;
+      }
     }
 
     function renderMapDots() {
@@ -1801,19 +2010,20 @@
         const key = artist.region || "Unknown";
         const count = regionCounts.get(key) || 0;
         regionCounts.set(key, count + 1);
-        const [baseX, baseY] = getRegionCoordinate(key);
+        const [lon, lat] = getRegionCoordinate(key);
+        const [baseX, baseY] = mapProjection([lon, lat]);
         const angle = count * 2.399963;
-        const radius = count === 0 ? 0 : 9 + Math.floor(count / 6) * 8;
+        const radius = count === 0 ? 0 : 10 + Math.floor(count / 5) * 9;
         let x = baseX + Math.cos(angle) * radius;
         let y = baseY + Math.sin(angle) * radius;
         let attempts = 0;
-        while (used.some(point => Math.hypot(point[0] - x, point[1] - y) < 12) && attempts < 20) {
+        while (used.some(point => Math.hypot(point[0] - x, point[1] - y) < 13) && attempts < 28) {
           attempts += 1;
-          x = baseX + Math.cos(angle + attempts) * (radius + attempts * 4);
-          y = baseY + Math.sin(angle + attempts) * (radius + attempts * 4);
+          x = baseX + Math.cos(angle + attempts * 0.85) * (radius + attempts * 3.5);
+          y = baseY + Math.sin(angle + attempts * 0.85) * (radius + attempts * 3.5);
         }
-        x = Math.max(20, Math.min(980, x));
-        y = Math.max(20, Math.min(500, y));
+        x = Math.max(18, Math.min(982, x));
+        y = Math.max(22, Math.min(538, y));
         used.push([x, y]);
         return `<circle class="map-dot ${hasSent(artist) ? "sent" : "unsent"}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${hasSent(artist) ? 5 : 4}"><title>${escapeHtml(artist.name)} — ${escapeHtml(key)}${hasSent(artist) ? " — SENT" : ""}</title></circle>`;
       }).join("");
@@ -1912,8 +2122,11 @@
     window.openAllLinks = openAllLinks;
     window.deleteArtist = deleteArtist;
     window.addSendEntry = addSendEntry;
+    window.emptySendCheckboxClicked = emptySendCheckboxClicked;
     window.createFirstSendEntry = createFirstSendEntry;
+    window.clearFirstSendEntry = clearFirstSendEntry;
     window.changeSendEntryDate = changeSendEntryDate;
+    window.removeSendEntry = removeSendEntry;
     window.toggleSendEntryChecked = toggleSendEntryChecked;
     window.showSendWarningForId = showSendWarningForId;
     window.expandSendEntries = expandSendEntries;
