@@ -1285,14 +1285,9 @@
 
 
     <section class="visuals-page hidden" id="visualsPage">
-      <div class="visuals-header">
-        <h2>Visuals</h2>
-        <button class="nav-btn" onclick="showDashboardPage()">Back to Dashboard</button>
-      </div>
       <div class="visuals-grid">
         <a class="visual-card" href="phonk_visuals_generator.html">
           <strong>Phonk Visuals</strong>
-          <span>Open the fantasy prompt generator in this same tab. Built for fast cover art and visual prompt presets.</span>
         </a>
       </div>
     </section>
@@ -1765,6 +1760,7 @@
           setSignedInUi(true);
 
           await loadCloudDashboard();
+          routeFromHash();
         });
       } catch (error) {
         console.error("Firebase init failed", error);
@@ -2551,6 +2547,19 @@
     colorFilter.addEventListener("change", renderArtists);
     sortSelect.addEventListener("change", renderArtists);
 
+
+
+    function routeFromHash() {
+      const route = String(window.location.hash || "").replace("#", "").toLowerCase();
+      if (route === "settings") {
+        showSettingsPage();
+      } else if (route === "visuals") {
+        showVisualsPage();
+      } else {
+        showDashboardPage();
+      }
+    }
+
     window.openAddArtistModal = openAddArtistModal;
     window.closeAddArtistModal = closeAddArtistModal;
     window.clearAddArtistForm = clearAddArtistForm;
@@ -2579,9 +2588,12 @@
     window.showSettingsPage = showSettingsPage;
     window.showDashboardPage = showDashboardPage;
     window.showVisualsPage = showVisualsPage;
+    window.routeFromHash = routeFromHash;
     window.showMapPage = showMapPage;
     window.copyArtistList = copyArtistList;
     window.toggleMobileFilters = toggleMobileFilters;
+
+    window.addEventListener("hashchange", routeFromHash);
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 980) closeMobileFilters();
