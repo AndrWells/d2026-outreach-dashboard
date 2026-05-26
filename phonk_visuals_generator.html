@@ -63,7 +63,7 @@
     }
 
     .app {
-      width: min(1240px, 100%);
+      width: min(1680px, 100%);
       margin: 0 auto;
     }
 
@@ -399,7 +399,7 @@
         <a class="nav-btn" href="index.html#dashboard">Dashboard</a>
         <a class="nav-btn" href="index.html#visuals">Visuals</a>
         <a class="nav-btn" href="index.html#settings">Settings</a>
-        <a class="auth-btn" href="index.html#dashboard">Sign in Google</a>
+        <button class="auth-btn" id="authBtn" type="button" onclick="toggleAuth()">Sign in Google</button>
       </div>
     </section>
     <main>
@@ -597,6 +597,73 @@
       <div>Authorized internal use only.</div>
     </footer>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4mAggiPorQdcnMrvox8t6ZNxF7o1C98o",
+      authDomain: "druskhi-outreach-dashboard.firebaseapp.com",
+      projectId: "druskhi-outreach-dashboard",
+      storageBucket: "druskhi-outreach-dashboard.firebasestorage.app",
+      messagingSenderId: "375387055106",
+      appId: "1:375387055106:web:68ab3ab1f9bd796f85b31b"
+    };
+
+    const FIREBASE_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
+    let firebaseAuth = null;
+    let firebaseProvider = null;
+
+    function setAuthButton(isSignedIn) {
+      const authBtn = document.getElementById("authBtn");
+      if (!authBtn) return;
+      authBtn.textContent = isSignedIn ? "Sign out" : "Sign in Google";
+      authBtn.setAttribute("aria-label", isSignedIn ? "Sign out of Google" : "Sign in with Google");
+    }
+
+    async function initFirebaseAuth() {
+      if (!FIREBASE_ENABLED) {
+        setAuthButton(false);
+        return;
+      }
+
+      try {
+        const firebaseApp = initializeApp(firebaseConfig);
+        firebaseAuth = getAuth(firebaseApp);
+        firebaseProvider = new GoogleAuthProvider();
+
+        onAuthStateChanged(firebaseAuth, user => {
+          setAuthButton(Boolean(user));
+        });
+      } catch (error) {
+        console.error("Firebase auth init failed", error);
+        setAuthButton(false);
+      }
+    }
+
+    async function toggleAuth() {
+      if (!FIREBASE_ENABLED || !firebaseAuth || !firebaseProvider) {
+        alert("Firebase sign-in is not ready. Check the Firebase config.");
+        return;
+      }
+
+      try {
+        if (firebaseAuth.currentUser) {
+          await signOut(firebaseAuth);
+        } else {
+          await signInWithPopup(firebaseAuth, firebaseProvider);
+        }
+      } catch (error) {
+        console.error("Auth failed", error);
+        alert("Firebase sign-in failed. Check authorized domains and popup permissions.");
+      }
+    }
+
+    window.toggleAuth = toggleAuth;
+    setAuthButton(false);
+    initFirebaseAuth();
+  </script>
 
   <script>
     const output = document.getElementById('output');
